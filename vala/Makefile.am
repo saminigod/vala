@@ -26,6 +26,7 @@ libvalacore_la_VALASOURCES = \
 	valaassignment.vala \
 	valaattribute.vala \
 	valabaseaccess.vala \
+	valabasestatement.vala \
 	valabasicblock.vala \
 	valabinaryexpression.vala \
 	valablock.vala \
@@ -135,7 +136,6 @@ libvalacore_la_VALASOURCES = \
 	valasourcelocation.vala \
 	valasourcereference.vala \
 	valastatement.vala \
-	valastatementlist.vala \
 	valastringliteral.vala \
 	valastruct.vala \
 	valastructvaluetype.vala \
