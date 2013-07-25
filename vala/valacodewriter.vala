@@ -290,26 +290,8 @@ public class Vala.CodeWriter : CodeVisitor {
 			return;
 		}
 
-		var sorted_symbols = new ArrayList<Symbol> ();
-		foreach (Symbol sym in symbols) {
-			int left = 0;
-			int right = sorted_symbols.size - 1;
-			if (left > right || sym.name < sorted_symbols[left].name) {
-				sorted_symbols.insert (0, sym);
-			} else if (sym.name > sorted_symbols[right].name) {
-				sorted_symbols.add (sym);
-			} else {
-				while (right - left > 1) {
-					int i = (right + left) / 2;
-					if (sym.name > sorted_symbols[i].name) {
-						left = i;
-					} else {
-						right = i;
-					}
-				}
-				sorted_symbols.insert (left + 1, sym);
-			}
-		}
+		var sorted_symbols = symbols.slice (0, symbols.size);
+		sorted_symbols.sort ();
 		foreach (Symbol sym in sorted_symbols) {
 			sym.accept (this);
 		}
