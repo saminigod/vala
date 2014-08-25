@@ -1647,7 +1647,7 @@ public class Vala.CodeWriter : CodeVisitor {
 			iter = iter.next ();
 
 			var keys = new GLib.Sequence<string> ();
-			foreach (var key in attr.args.get_keys ()) {
+			foreach (var key in attr.args.keys) {
 				if (key == "cheader_filename" && sym is Namespace) {
 					continue;
 				}
