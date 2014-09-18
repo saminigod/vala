@@ -435,11 +435,11 @@ public class Vala.ObjectCreationExpression : Expression {
 
 				insert_statement (context.analyzer.insert_block, decl);
 
+				// create before check as local.floating might become false
 				var temp_access = SemanticAnalyzer.create_temp_access (local, target_type);
 				// don't set initializer earlier as this changes parent_node and parent_statement
 				local.initializer = this;
 				decl.check (context);
-
 
 				// move temp variable to insert block to ensure the
 				// variable is in the same block as the declaration

@@ -233,6 +233,9 @@ public class Vala.BinaryExpression : Expression {
 			insert_statement (context.analyzer.insert_block, decl);
 			insert_statement (context.analyzer.insert_block, if_stmt);
 
+			// create before check as local.floating might become false
+			var temp_access = SemanticAnalyzer.create_temp_access (local, target_type);
+			
 			if (!decl.check (context)) {
 				error = true;
 				return false;
@@ -243,7 +246,6 @@ public class Vala.BinaryExpression : Expression {
 				return false;
 			}
 
-			var temp_access = SemanticAnalyzer.create_temp_access (local, target_type);
 			temp_access.check (context);
 
 			parent_node.replace_expression (this, temp_access);

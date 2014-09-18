@@ -82,6 +82,7 @@ TESTS = \
 	control-flow/bug661985.vala \
 	control-flow/bug665904.vala \
 	control-flow/bug691514.vala	\
+	control-flow/bug736774.vala \
 	enums/enums.vala \
 	enums/flags.vala \
 	enums/bug673879.vala \

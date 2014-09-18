@@ -897,6 +897,7 @@ public class Vala.SemanticAnalyzer : CodeVisitor {
 			temp_access = new ReferenceTransferExpression (temp_access, local.source_reference);
 			temp_access.target_type = target_type != null ? target_type.copy () : local.variable_type.copy ();
 			temp_access.target_type.value_owned = true;
+			local.floating = false;
 		} else {
 			temp_access.target_type = target_type != null ? target_type.copy () : null;
 		}
