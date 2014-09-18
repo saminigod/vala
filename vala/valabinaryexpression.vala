@@ -217,6 +217,7 @@ public class Vala.BinaryExpression : Expression {
 			}
 		
 			var local = new LocalVariable (local_type, get_temp_name (), left, source_reference);
+			local.floating = true;
 			var decl = new DeclarationStatement (local, source_reference);
 
 			var right_stmt = new ExpressionStatement (new Assignment (new MemberAccess.simple (local.name, right.source_reference), right, AssignmentOperator.SIMPLE, right.source_reference), right.source_reference);

@@ -430,6 +430,7 @@ public class Vala.ObjectCreationExpression : Expression {
 				var old_parent_node = parent_node;
 
 				var local = new LocalVariable (value_type.copy (), get_temp_name (), null, source_reference);
+				local.floating = true;
 				var decl = new DeclarationStatement (local, source_reference);
 
 				insert_statement (context.analyzer.insert_block, decl);
