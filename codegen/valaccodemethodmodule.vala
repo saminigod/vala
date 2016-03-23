@@ -124,24 +124,32 @@ public abstract class Vala.CCodeMethodModule : CCodeStructModule {
 	}
 
 	public void complete_async () {
-		var state = new CCodeMemberAccess.pointer (new CCodeIdentifier ("_data_"), "_state_");
-		var zero = new CCodeConstant ("0");
-		var state_is_zero = new CCodeBinaryExpression (CCodeBinaryOperator.EQUALITY, state, zero);
-		ccode.open_if (state_is_zero);
-
 		var async_result_expr = new CCodeMemberAccess.pointer (new CCodeIdentifier ("_data_"), "_async_result");
 
-		var idle_call = new CCodeFunctionCall (new CCodeIdentifier ("g_simple_async_result_complete_in_idle"));
-		idle_call.add_argument (async_result_expr);
-		ccode.add_expression (idle_call);
+		if (context.require_glib_version (2, 36)) {
+			var finish_call = new CCodeFunctionCall (new CCodeIdentifier ("g_task_return_pointer"));
+			finish_call.add_argument (async_result_expr);
+			finish_call.add_argument (new CCodeIdentifier ("_data_"));
+			finish_call.add_argument (new CCodeConstant ("NULL"));
+			ccode.add_expression (finish_call);
+		} else {
+			var state = new CCodeMemberAccess.pointer (new CCodeIdentifier ("_data_"), "_state_");
+			var zero = new CCodeConstant ("0");
+			var state_is_zero = new CCodeBinaryExpression (CCodeBinaryOperator.EQUALITY, state, zero);
+			ccode.open_if (state_is_zero);
 
-		ccode.add_else ();
+			var idle_call = new CCodeFunctionCall (new CCodeIdentifier ("g_simple_async_result_complete_in_idle"));
+			idle_call.add_argument (async_result_expr);
+			ccode.add_expression (idle_call);
 
-		var direct_call = new CCodeFunctionCall (new CCodeIdentifier ("g_simple_async_result_complete"));
-		direct_call.add_argument (async_result_expr);
-		ccode.add_expression (direct_call);
+			ccode.add_else ();
 
-		ccode.close ();
+			var direct_call = new CCodeFunctionCall (new CCodeIdentifier ("g_simple_async_result_complete"));
+			direct_call.add_argument (async_result_expr);
+			ccode.add_expression (direct_call);
+
+			ccode.close ();
+		}
 
 		var unref = new CCodeFunctionCall (new CCodeIdentifier ("g_object_unref"));
 		unref.add_argument (async_result_expr);
