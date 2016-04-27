@@ -570,7 +570,17 @@ public class Vala.GAsyncModule : GtkModule {
 
 			ccode.add_assignment (data_var, ccall);
 
-			if (m.get_error_types ().size > 0) {
+			bool has_cancellable = false;
+
+			foreach (Parameter param in m.get_parameters ()) {
+				if (param.variable_type is ObjectType && param.variable_type.data_type.get_full_name () == "GLib.Cancellable") {
+					has_cancellable = true;
+					break;
+				}
+			}
+
+			// If a task is cancelled, g_task_propagate_pointer returns NULL
+			if (m.get_error_types ().size > 0 || has_cancellable) {
 				var is_null = new CCodeBinaryExpression (CCodeBinaryOperator.EQUALITY, new CCodeConstant ("NULL"), data_var);
 
 				ccode.open_if (is_null);
