@@ -53,12 +53,16 @@ dist_vapi_DATA = \
 	gdk-2.0.vapi \
 	gdk-3.0.deps \
 	gdk-3.0.vapi \
+	gdk-4.0.deps \
+	gdk-4.0.vapi \
 	gdk-pixbuf-2.0.deps \
 	gdk-pixbuf-2.0.vapi \
 	gdk-x11-2.0.deps \
 	gdk-x11-2.0.vapi \
 	gdk-x11-3.0.deps \
 	gdk-x11-3.0.vapi \
+	gdk-x11-4.0.deps \
+	gdk-x11-4.0.vapi \
 	gdl-1.0.deps \
 	gdl-1.0.vapi \
 	gdl-3.0.deps \
@@ -90,6 +94,8 @@ dist_vapi_DATA = \
 	goocanvas.vapi \
 	graphene-1.0.deps \
 	graphene-1.0.vapi \
+	gsk-4.0.deps \
+	gsk-4.0.vapi \
 	gsl.vapi \
 	gstreamer-0.10.deps \
 	gstreamer-0.10.vapi \
@@ -168,6 +174,8 @@ dist_vapi_DATA = \
 	gtk+-2.0.vapi \
 	gtk+-3.0.deps \
 	gtk+-3.0.vapi \
+	gtk+-4.0.deps \
+	gtk+-4.0.vapi \
 	gtkmozembed.deps \
 	gtkmozembed.vapi \
 	gtksourceview-2.0.deps \
@@ -416,13 +424,17 @@ GIR_BINDINGS = \
 	clutter-x11-1.0 \
 	cogl-pango-1.0 \
 	gdk-3.0 \
+	gdk-4.0 \
 	gdk-x11-3.0 \
+	gdk-x11-4.0 \
 	gdk-pixbuf-2.0 \
 	gdl-3.0 \
 	geocode-glib-1.0 \
 	gio-2.0 \
 	gobject-introspection-1.0 \
 	graphene-1.0 \
+	gsk-4.0 \
+	gtk+-4.0 \
 	gudev-1.0 \
 	json-glib-1.0 \
 	libgdata \
@@ -516,6 +528,9 @@ gdk-2.0:
 gdk-3.0:
 	$(GENVAPI) --library $(srcdir)/gdk-3.0 --pkg gio-2.0 --metadatadir $(METADATADIR) $(METADATADIR)/Gdk-3.0-custom.vala $(GIRDIR)/Gdk-3.0.gir
 
+gdk-4.0:
+	$(GENVAPI) --library $(srcdir)/gdk-4.0 --pkg cairo --pkg gdk-pixbuf-2.0 --pkg pango --pkg gio-2.0 --metadatadir $(METADATADIR) $(METADATADIR)/Gdk-4.0-custom.vala $(GIRDIR)/Gdk-4.0.gir
+
 gdk-pixbuf-2.0:
 	$(GENVAPI) --library $(srcdir)/gdk-pixbuf-2.0 --pkg gio-2.0 --metadatadir $(METADATADIR) $(METADATADIR)/GdkPixbuf-2.0-custom.vala $(GIRDIR)/GdkPixbuf-2.0.gir
 
@@ -524,6 +539,9 @@ gdk-x11-2.0:
 
 gdk-x11-3.0:
 	$(GENVAPI) --library $(srcdir)/gdk-x11-3.0 --pkg gio-2.0 --pkg gdk-3.0 --pkg x11 --metadatadir $(METADATADIR) $(METADATADIR)/GdkX11-3.0-custom.vala $(GIRDIR)/GdkX11-3.0.gir
+
+gdk-x11-4.0:
+	$(GENVAPI) --library $(srcdir)/gdk-x11-4.0 --pkg gio-2.0 --pkg gdk-4.0 --pkg x11 --metadatadir $(METADATADIR) $(METADATADIR)/GdkX11-4.0-custom.vala $(GIRDIR)/GdkX11-4.0.gir
 
 gdl-1.0:
 	$(GENVAPI) --library $(srcdir)/gdl-1.0 $(PACKAGESDIR)/gdl-1.0/gdl-1.0-custom.vala $(PACKAGESDIR)/gdl-1.0/gdl-1.0.gi
@@ -566,6 +584,9 @@ goocanvas:
 
 graphene-1.0:
 	$(GENVAPI) --library $(srcdir)/graphene-1.0 --pkg gobject-2.0 --metadatadir $(METADATADIR) $(GIRDIR)/Graphene-1.0.gir
+
+gsk-4.0:
+	$(GENVAPI) --library $(srcdir)/gsk-4.0 --pkg gio-2.0 --pkg gdk-4.0 --metadatadir $(METADATADIR) $(METADATADIR)/Gsk-4.0-custom.vala $(GIRDIR)/Gsk-4.0.gir
 
 gstreamer-0.10:
 	$(GENVAPI) --library $(srcdir)/gstreamer-0.10 $(PACKAGESDIR)/gstreamer-0.10/gstreamer-0.10-custom.vala $(PACKAGESDIR)/gstreamer-0.10/gstreamer-0.10.gi
@@ -683,6 +704,9 @@ gtk+-2.0:
 
 gtk+-3.0:
 	$(GENVAPI) --library $(srcdir)/gtk+-3.0 $(PACKAGESDIR)/gtk+-3.0/gtk+-3.0-custom.vala $(PACKAGESDIR)/gtk+-3.0/gtk+-3.0.gi
+
+gtk+-4.0:
+	$(GENVAPI) --library $(srcdir)/gtk+-4.0 --pkg atk --pkg gdk-4.0 --pkg gdk-pixbuf-2.0 --pkg gio-2.0 --pkg pango --pkg cairo --metadatadir $(METADATADIR) $(METADATADIR)/Gtk-4.0-custom.vala $(GIRDIR)/Gtk-4.0.gir
 
 gtksourceview-2.0:
 	$(GENVAPI) --library $(srcdir)/gtksourceview-2.0 $(PACKAGESDIR)/gtksourceview-2.0/gtksourceview-2.0.gi
