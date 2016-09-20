@@ -34,7 +34,7 @@ public interface Vala.Map<K,V> : Object, Iterable<Map.Entry<K,V>> {
 	 * Specifies whether this map is empty.
 	 */
 	public virtual bool is_empty { get { return size == 0; } }
-
+	
 	/**
 	 * Specifies whether this collection can change - i.e. wheather {@link set},
 	 * {@link remove} etc. are legal operations.
@@ -71,7 +71,7 @@ public interface Vala.Map<K,V> : Object, Iterable<Map.Entry<K,V>> {
 		public abstract V value { get; set; }
 
 		/**
-		 * ``true'' if the setting value is permitted.
+		 * ``true`` if the setting value is permitted.
 		 */
 		public abstract bool read_only { get; }
 	}
@@ -91,10 +91,12 @@ public interface Vala.Map<K,V> : Object, Iterable<Map.Entry<K,V>> {
 	 * @param key the key to locate in the map
 	 *
 	 * @return    ``true`` if key is found, ``false`` otherwise
-	 *
-	 * @deprecated Use {@link has_key} method instead.
 	 */
-	[Version (deprecated = true)]
+#if VALA_0_32
+	[Version (deprecated = true, replacement = "Map.has_key")]
+#else
+	[Deprecated (replacement = "Map.has_key")]
+#endif
 	public bool contains (K key) {
 		return has_key(key);
 	}
@@ -144,10 +146,12 @@ public interface Vala.Map<K,V> : Object, Iterable<Map.Entry<K,V>> {
 	 * @param value the receiver variable for the removed value
 	 *
 	 * @return    ``true`` if the map has been changed, ``false`` otherwise
-	 *
-	 * @deprecated Use {@link unset} method instead.
 	 */
-	[Version (deprecated = true)]
+#if VALA_0_32
+	[Version (deprecated = true, replacement = "Map.unset")]
+#else
+	[Deprecated (replacement = "Map.unset")]
+#endif
 	public bool remove (K key, out V? value = null) {
 		return unset (key, out value);
 	}
@@ -187,7 +191,7 @@ public interface Vala.Map<K,V> : Object, Iterable<Map.Entry<K,V>> {
 		foreach (K key in map.keys) {
 			changed = changed | unset (key);
 		}
-		return changed;
+		return changed;	
 	}
 
 	/**
@@ -195,10 +199,12 @@ public interface Vala.Map<K,V> : Object, Iterable<Map.Entry<K,V>> {
 	 * and this map.
 	 *
 	 * @param map the map which common items are deleted from this map
-	 *
-	 * @deprecated Use {@link unset_all} method instead.
 	 */
-	[Version (deprecated = true)]
+#if VALA_0_32
+	[Version (deprecated = true, replacement = "Map.unset_all")]
+#else
+	[Deprecated (replacement = "Map.unset_all")]
+#endif
 	public bool remove_all (Map<K,V> map) {
 		return unset_all (map);
 	}
@@ -221,10 +227,12 @@ public interface Vala.Map<K,V> : Object, Iterable<Map.Entry<K,V>> {
 	 * Returns ``true`` it this map contains all items as the input map.
 	 *
 	 * @param map the map which items will be compared with this map
-	 *
-	 * @deprecated Use {@link has_all} method instead.
 	 */
-	[Version (deprecated = true)]
+#if VALA_0_32
+	[Version (deprecated = true, replacement = "Map.has_all")]
+#else
+	[Deprecated (replacement = "Map.has_all")]
+#endif
 	public bool contains_all (Map<K,V> map) {
 		return has_all (map);
 	}
