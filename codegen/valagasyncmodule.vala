@@ -155,7 +155,7 @@ public class Vala.GAsyncModule : GtkModule {
 
 		var dataname = Symbol.lower_case_to_camel_case (get_ccode_name (m)) + "Data";
 		var asyncfunc = new CCodeFunction (get_ccode_real_name (m), "void");
-		var cparam_map = new HashMap<int,CCodeParameter> ();
+		var cparam_map = new TreeMap<int,CCodeParameter> ();
 
 		cparam_map.set (get_param_pos (-1), new CCodeParameter ("_callback_", "GAsyncReadyCallback"));
 		cparam_map.set (get_param_pos (-0.9), new CCodeParameter ("_user_data_", "gpointer"));
@@ -304,7 +304,7 @@ public class Vala.GAsyncModule : GtkModule {
 			var cl = m.parent_symbol as Class;
 
 			var asyncfunc = new CCodeFunction (get_ccode_name (m), "void");
-			var cparam_map = new HashMap<int,CCodeParameter> ();
+			var cparam_map = new TreeMap<int,CCodeParameter> ();
 			var carg_map = new HashMap<int,CCodeExpression> ();
 
 			if (m.is_private_symbol ()) {
@@ -321,7 +321,7 @@ public class Vala.GAsyncModule : GtkModule {
 			}
 
 			var finishfunc = new CCodeFunction (get_ccode_finish_name (m));
-			cparam_map = new HashMap<int,CCodeParameter> ();
+			cparam_map = new TreeMap<int,CCodeParameter> ();
 			carg_map = new HashMap<int,CCodeExpression> ();
 
 			if (m.is_private_symbol ()) {
@@ -347,7 +347,7 @@ public class Vala.GAsyncModule : GtkModule {
 					function.modifiers |= CCodeModifiers.INTERNAL;
 				}
 
-				cparam_map = new HashMap<int,CCodeParameter> ();
+				cparam_map = new TreeMap<int,CCodeParameter> ();
 				generate_cparameters (m, decl_space, cparam_map, function, null, null, null, 1);
 
 				decl_space.add_function_declaration (function);
@@ -360,7 +360,7 @@ public class Vala.GAsyncModule : GtkModule {
 					function.modifiers |= CCodeModifiers.INTERNAL;
 				}
 
-				cparam_map = new HashMap<int,CCodeParameter> ();
+				cparam_map = new TreeMap<int,CCodeParameter> ();
 				generate_cparameters (m, decl_space, cparam_map, function, null, null, null, 2);
 
 				decl_space.add_function_declaration (function);
@@ -406,11 +406,11 @@ public class Vala.GAsyncModule : GtkModule {
 
 			if (m.is_abstract || m.is_virtual) {
 				// generate virtual function wrappers
-				var cparam_map = new HashMap<int,CCodeParameter> ();
+				var cparam_map = new TreeMap<int,CCodeParameter> ();
 				var carg_map = new HashMap<int,CCodeExpression> ();
 				generate_vfunc (m, new VoidType (), cparam_map, carg_map, "", 1);
 
-				cparam_map = new HashMap<int,CCodeParameter> ();
+				cparam_map = new TreeMap<int,CCodeParameter> ();
 				carg_map = new HashMap<int,CCodeExpression> ();
 				generate_vfunc (m, m.return_type, cparam_map, carg_map, "_finish", 2);
 			}
@@ -437,7 +437,7 @@ public class Vala.GAsyncModule : GtkModule {
 			if (current_type_symbol is Class && !current_class.is_compact && !current_class.is_abstract) {
 				var vfunc = new CCodeFunction (get_ccode_name (m));
 
-				var cparam_map = new HashMap<int,CCodeParameter> ();
+				var cparam_map = new TreeMap<int,CCodeParameter> ();
 				var carg_map = new HashMap<int,CCodeExpression> ();
 
 				push_function (vfunc);
@@ -459,7 +459,7 @@ public class Vala.GAsyncModule : GtkModule {
 
 				vfunc = new CCodeFunction (get_ccode_finish_name (m));
 
-				cparam_map = new HashMap<int,CCodeParameter> ();
+				cparam_map = new TreeMap<int,CCodeParameter> ();
 				carg_map = new HashMap<int,CCodeExpression> ();
 
 				push_function (vfunc);
@@ -489,7 +489,7 @@ public class Vala.GAsyncModule : GtkModule {
 
 		var finishfunc = new CCodeFunction (get_ccode_finish_real_name (m));
 
-		var cparam_map = new HashMap<int,CCodeParameter> ();
+		var cparam_map = new TreeMap<int,CCodeParameter> ();
 
 		cparam_map.set (get_param_pos (0.1), new CCodeParameter ("_res_", "GAsyncResult*"));
 
@@ -637,7 +637,7 @@ public class Vala.GAsyncModule : GtkModule {
 
 		// add vfunc field to the type struct
 		var vdeclarator = new CCodeFunctionDeclarator (get_ccode_vfunc_name (m));
-		var cparam_map = new HashMap<int,CCodeParameter> ();
+		var cparam_map = new TreeMap<int,CCodeParameter> ();
 
 		generate_cparameters (m, decl_space, cparam_map, new CCodeFunction ("fake"), vdeclarator, null, null, 1);
 
@@ -647,7 +647,7 @@ public class Vala.GAsyncModule : GtkModule {
 
 		// add vfunc field to the type struct
 		vdeclarator = new CCodeFunctionDeclarator (get_ccode_finish_vfunc_name (m));
-		cparam_map = new HashMap<int,CCodeParameter> ();
+		cparam_map = new TreeMap<int,CCodeParameter> ();
 
 		generate_cparameters (m, decl_space, cparam_map, new CCodeFunction ("fake"), vdeclarator, null, null, 2);
 
@@ -725,7 +725,7 @@ public class Vala.GAsyncModule : GtkModule {
 		complete_async ();
 	}
 
-	public override void generate_cparameters (Method m, CCodeFile decl_space, Map<int,CCodeParameter> cparam_map, CCodeFunction func, CCodeFunctionDeclarator? vdeclarator = null, Map<int,CCodeExpression>? carg_map = null, CCodeFunctionCall? vcall = null, int direction = 3) {
+	public override void generate_cparameters (Method m, CCodeFile decl_space, SortedMap<int,CCodeParameter> cparam_map, CCodeFunction func, CCodeFunctionDeclarator? vdeclarator = null, Map<int,CCodeExpression>? carg_map = null, CCodeFunctionCall? vcall = null, int direction = 3) {
 		if (m.coroutine) {
 			decl_space.add_include ("gio/gio.h");
 

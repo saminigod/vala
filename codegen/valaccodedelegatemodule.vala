@@ -207,7 +207,7 @@ public class Vala.CCodeDelegateModule : CCodeArrayModule {
 
 		push_function (function);
 
-		var cparam_map = new HashMap<int,CCodeParameter> ();
+		var cparam_map = new TreeMap<int,CCodeParameter> ();
 
 		if (d.has_target) {
 			var cparam = new CCodeParameter ("self", "gpointer");
@@ -264,26 +264,14 @@ public class Vala.CCodeDelegateModule : CCodeArrayModule {
 		}
 
 		// append C parameters in the right order
-		int last_pos = -1;
-		int min_pos;
-		while (true) {
-			min_pos = -1;
-			foreach (int pos in cparam_map.keys) {
-				if (pos > last_pos && (min_pos == -1 || pos < min_pos)) {
-					min_pos = pos;
-				}
-			}
-			if (min_pos == -1) {
-				break;
-			}
-			function.add_parameter (cparam_map.get (min_pos));
-			last_pos = min_pos;
-		}
-
+		cparam_map.values.foreach ((param) => {
+			function.add_parameter (param);
+			return true;
+		});
 
 		// definition
 
-		var carg_map = new HashMap<int,CCodeExpression> ();
+		var carg_map = new TreeMap<int,CCodeExpression> ();
 
 		int i = 0;
 		if (m.binding == MemberBinding.INSTANCE || m.closure) {
@@ -389,20 +377,10 @@ public class Vala.CCodeDelegateModule : CCodeArrayModule {
 		var ccall = new CCodeFunctionCall (new CCodeIdentifier (get_ccode_name (m)));
 
 		// append C arguments in the right order
-		last_pos = -1;
-		while (true) {
-			min_pos = -1;
-			foreach (int pos in carg_map.keys) {
-				if (pos > last_pos && (min_pos == -1 || pos < min_pos)) {
-					min_pos = pos;
-				}
-			}
-			if (min_pos == -1) {
-				break;
-			}
-			ccall.add_argument (carg_map.get (min_pos));
-			last_pos = min_pos;
-		}
+		carg_map.values.foreach ((arg) => {
+			ccall.add_argument (arg);
+			return true;
+		});
 
 		if (m.coroutine) {
 			ccall.add_argument (new CCodeConstant ("NULL"));

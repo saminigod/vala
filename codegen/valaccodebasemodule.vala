@@ -1461,7 +1461,7 @@ public abstract class Vala.CCodeBaseModule : CodeGenerator {
 	public virtual void generate_delegate_declaration (Delegate d, CCodeFile decl_space) {
 	}
 
-	public virtual void generate_cparameters (Method m, CCodeFile decl_space, Map<int,CCodeParameter> cparam_map, CCodeFunction func, CCodeFunctionDeclarator? vdeclarator = null, Map<int,CCodeExpression>? carg_map = null, CCodeFunctionCall? vcall = null, int direction = 3) {
+	public virtual void generate_cparameters (Method m, CCodeFile decl_space, SortedMap<int,CCodeParameter> cparam_map, CCodeFunction func, CCodeFunctionDeclarator? vdeclarator = null, Map<int,CCodeExpression>? carg_map = null, CCodeFunctionCall? vcall = null, int direction = 3) {
 	}
 
 	public void generate_property_accessor_declaration (PropertyAccessor acc, CCodeFile decl_space) {
@@ -4566,7 +4566,7 @@ public abstract class Vala.CCodeBaseModule : CodeGenerator {
 
 			generate_type_declaration (expr.type_reference, cfile);
 
-			var in_arg_map = new HashMap<int,CCodeExpression> ();
+			var in_arg_map = new TreeMap<int,CCodeExpression> ();
 			var out_arg_map = in_arg_map;
 
 			if (m != null && m.coroutine) {
@@ -4578,7 +4578,7 @@ public abstract class Vala.CCodeBaseModule : CodeGenerator {
 				creation_call = finish_call;
 
 				// output arguments used separately
-				out_arg_map = new HashMap<int,CCodeExpression> ();
+				out_arg_map = new TreeMap<int,CCodeExpression> ();
 				// pass GAsyncResult stored in closure to finish function
 				out_arg_map.set (get_param_pos (0.1), new CCodeMemberAccess.pointer (new CCodeIdentifier ("_data_"), "_res_"));
 			}
@@ -4702,44 +4702,19 @@ public abstract class Vala.CCodeBaseModule : CodeGenerator {
 				}
 			}
 
-			// append C arguments in the right order
-
-			int last_pos;
-			int min_pos;
-
 			if (async_call != creation_call) {
 				// don't append out arguments for .begin() calls
-				last_pos = -1;
-				while (true) {
-					min_pos = -1;
-					foreach (int pos in out_arg_map.keys) {
-						if (pos > last_pos && (min_pos == -1 || pos < min_pos)) {
-							min_pos = pos;
-						}
-					}
-					if (min_pos == -1) {
-						break;
-					}
-					creation_call.add_argument (out_arg_map.get (min_pos));
-					last_pos = min_pos;
-				}
+				out_arg_map.values.foreach ((arg) => {
+					creation_call.add_argument (arg);
+					return true;
+				});
 			}
 
 			if (async_call != null) {
-				last_pos = -1;
-				while (true) {
-					min_pos = -1;
-					foreach (int pos in in_arg_map.keys) {
-						if (pos > last_pos && (min_pos == -1 || pos < min_pos)) {
-							min_pos = pos;
-						}
-					}
-					if (min_pos == -1) {
-						break;
-					}
-					async_call.add_argument (in_arg_map.get (min_pos));
-					last_pos = min_pos;
-				}
+				in_arg_map.values.foreach ((arg) => {
+					async_call.add_argument (arg);
+					return true;
+				});
 			}
 
 			if (expr.is_yield_expression) {

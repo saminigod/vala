@@ -392,7 +392,7 @@ public class Vala.GTypeModule : GErrorModule {
 
 		// add vfunc field to the type struct
 		var vdeclarator = new CCodeFunctionDeclarator (get_ccode_vfunc_name (m));
-		var cparam_map = new HashMap<int,CCodeParameter> ();
+		var cparam_map = new TreeMap<int,CCodeParameter> ();
 
 		generate_cparameters (m, decl_space, cparam_map, new CCodeFunction ("fake"), vdeclarator);
 
@@ -1492,34 +1492,24 @@ public class Vala.GTypeModule : GErrorModule {
 		string cast_args = get_ccode_name (base_type) + "*";
 
 		var vdeclarator = new CCodeFunctionDeclarator (get_ccode_vfunc_name (m));
-		var cparam_map = new HashMap<int,CCodeParameter> ();
+		var cparam_map = new TreeMap<int,CCodeParameter> ();
 
 		generate_cparameters (m, cfile, cparam_map, new CCodeFunction ("fake"), vdeclarator);
 
 		// append C arguments in the right order
-		int last_pos = -1;
-		int min_pos;
-		while (true) {
-			min_pos = -1;
-			foreach (int pos in cparam_map.keys) {
-				if (pos > last_pos && (min_pos == -1 || pos < min_pos)) {
-					min_pos = pos;
-				}
-			}
-			if (last_pos != -1) { // Skip the 1st parameter
-				if (min_pos == -1) {
-					break;
-				}
-
-				var tmp = cparam_map.get (min_pos);
-				if (tmp.ellipsis) {
+		bool first = true;
+		cparam_map.values.foreach ((param) => {
+			if (!first) {
+				if (param.ellipsis) {
 					cast_args += ", " + " ...";
 				} else {
-					cast_args += ", " + tmp.type_name;
+					cast_args += ", " + param.type_name;
 				}
+			} else {
+				first = false;
 			}
-			last_pos = min_pos;
-		}
+			return true;
+		});
 		cast += "(" + cast_args + ")";
 		return new CCodeCastExpression (cfunc, cast);
 	}

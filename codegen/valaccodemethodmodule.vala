@@ -173,7 +173,7 @@ public abstract class Vala.CCodeMethodModule : CCodeStructModule {
 			function.modifiers |= CCodeModifiers.DEPRECATED;
 		}
 
-		var cparam_map = new HashMap<int,CCodeParameter> ();
+		var cparam_map = new TreeMap<int,CCodeParameter> ();
 		var carg_map = new HashMap<int,CCodeExpression> ();
 
 		var cl = m.parent_symbol as Class;
@@ -198,7 +198,7 @@ public abstract class Vala.CCodeMethodModule : CCodeStructModule {
 				function.modifiers |= CCodeModifiers.INTERNAL;
 			}
 
-			cparam_map = new HashMap<int,CCodeParameter> ();
+			cparam_map = new TreeMap<int,CCodeParameter> ();
 			bool etv_tmp = ellipses_to_valist;
 			ellipses_to_valist = false;
 			generate_cparameters (m, decl_space, cparam_map, function);
@@ -210,7 +210,7 @@ public abstract class Vala.CCodeMethodModule : CCodeStructModule {
 				// _constructv function
 				function = new CCodeFunction (get_ccode_constructv_name ((CreationMethod) m));
 
-				cparam_map = new HashMap<int,CCodeParameter> ();
+				cparam_map = new TreeMap<int,CCodeParameter> ();
 				generate_cparameters (m, decl_space, cparam_map, function);
 
 				decl_space.add_function_declaration (function);
@@ -416,7 +416,7 @@ public abstract class Vala.CCodeMethodModule : CCodeStructModule {
 			function.modifiers |= CCodeModifiers.INLINE;
 		}
 
-		var cparam_map = new HashMap<int,CCodeParameter> ();
+		var cparam_map = new TreeMap<int,CCodeParameter> ();
 
 		generate_cparameters (m, cfile, cparam_map, function);
 
@@ -815,7 +815,7 @@ public abstract class Vala.CCodeMethodModule : CCodeStructModule {
 		 * emitter! */
 			    m.signal_reference == null) {
 
-			cparam_map = new HashMap<int,CCodeParameter> ();
+			cparam_map = new TreeMap<int,CCodeParameter> ();
 			var carg_map = new HashMap<int,CCodeExpression> ();
 
 			generate_vfunc (m, creturn_type, cparam_map, carg_map);
@@ -909,7 +909,7 @@ public abstract class Vala.CCodeMethodModule : CCodeStructModule {
 		return cparam;
 	}
 
-	public override void generate_cparameters (Method m, CCodeFile decl_space, Map<int,CCodeParameter> cparam_map, CCodeFunction func, CCodeFunctionDeclarator? vdeclarator = null, Map<int,CCodeExpression>? carg_map = null, CCodeFunctionCall? vcall = null, int direction = 3) {
+	public override void generate_cparameters (Method m, CCodeFile decl_space, SortedMap<int,CCodeParameter> cparam_map, CCodeFunction func, CCodeFunctionDeclarator? vdeclarator = null, Map<int,CCodeExpression>? carg_map = null, CCodeFunctionCall? vcall = null, int direction = 3) {
 		if (m.closure) {
 			var closure_block = current_closure_block;
 			int block_id = get_block_id (closure_block);
@@ -1011,33 +1011,22 @@ public abstract class Vala.CCodeMethodModule : CCodeStructModule {
 		}
 
 		// append C parameters in the right order
-		int last_pos = -1;
-		int min_pos;
-		while (true) {
-			min_pos = -1;
-			foreach (int pos in cparam_map.keys) {
-				if (pos > last_pos && (min_pos == -1 || pos < min_pos)) {
-					min_pos = pos;
-				}
-			}
-			if (min_pos == -1) {
-				break;
-			}
-			func.add_parameter (cparam_map.get (min_pos));
+		cparam_map.keys.foreach ((pos) => {
+			func.add_parameter (cparam_map.get (pos));
 			if (vdeclarator != null) {
-				vdeclarator.add_parameter (cparam_map.get (min_pos));
+				vdeclarator.add_parameter (cparam_map.get (pos));
 			}
 			if (vcall != null) {
-				var arg = carg_map.get (min_pos);
+				var arg = carg_map.get (pos);
 				if (arg != null) {
 					vcall.add_argument (arg);
 				}
 			}
-			last_pos = min_pos;
-		}
+			return true;
+		});
 	}
 
-	public void generate_vfunc (Method m, DataType return_type, Map<int,CCodeParameter> cparam_map, Map<int,CCodeExpression> carg_map, string suffix = "", int direction = 3) {
+	public void generate_vfunc (Method m, DataType return_type, SortedMap<int,CCodeParameter> cparam_map, Map<int,CCodeExpression> carg_map, string suffix = "", int direction = 3) {
 		push_context (new EmitContext ());
 
 		string cname = get_ccode_name (m);
@@ -1193,7 +1182,7 @@ public abstract class Vala.CCodeMethodModule : CCodeStructModule {
 			vfunc.modifiers |= CCodeModifiers.INTERNAL;
 		}
 
-		var cparam_map = new HashMap<int,CCodeParameter> ();
+		var cparam_map = new TreeMap<int,CCodeParameter> ();
 		var carg_map = new HashMap<int,CCodeExpression> ();
 
 		push_function (vfunc);
