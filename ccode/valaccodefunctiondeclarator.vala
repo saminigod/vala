@@ -56,14 +56,15 @@ public class Vala.CCodeFunctionDeclarator : CCodeDeclarator {
 		writer.write_string (") (");
 		
 		bool first = true;
-		foreach (CCodeParameter param in parameters) {
+		parameters.foreach ((param) => {
 			if (!first) {
 				writer.write_string (", ");
 			} else {
 				first = false;
 			}
 			param.write (writer);
-		}
+			return true;
+	    });
 		
 		writer.write_string (")");
 	}

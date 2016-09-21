@@ -248,14 +248,15 @@ public class Vala.CodeWriter : CodeVisitor {
 			write_string (" : ");
 		
 			bool first = true;
-			foreach (DataType base_type in base_types) {
+			base_types.foreach ((base_type) => {
 				if (!first) {
 					write_string (", ");
 				} else {
 					first = false;
 				}
 				write_type (base_type);
-			}
+				return true;
+			});
 		}
 		write_begin_block ();
 
@@ -284,17 +285,19 @@ public class Vala.CodeWriter : CodeVisitor {
 	void visit_sorted (List<Symbol> symbols) {
 		if (type != CodeWriterType.EXTERNAL) {
 			// order of virtual methods matters for fast vapis
-			foreach (Symbol sym in symbols) {
+			symbols.foreach ((sym) => {
 				sym.accept (this);
-			}
+				return true;
+			});
 			return;
 		}
 
 		var sorted_symbols = symbols.slice (0, symbols.size);
 		sorted_symbols.sort ();
-		foreach (Symbol sym in sorted_symbols) {
+		sorted_symbols.foreach ((sym) => {
 			sym.accept (this);
-		}
+			return true;
+		});
 	}
 
 	public override void visit_struct (Struct st) {
@@ -328,9 +331,10 @@ public class Vala.CodeWriter : CodeVisitor {
 
 		current_scope = st.scope;
 
-		foreach (Field field in st.get_fields ()) {
+		st.get_fields ().foreach ((field) => {
 			field.accept (this);
-		}
+			return true;
+		});
 		visit_sorted (st.get_constants ());
 		visit_sorted (st.get_methods ());
 		visit_sorted (st.get_properties ());
@@ -368,14 +372,15 @@ public class Vala.CodeWriter : CodeVisitor {
 			write_string (" : ");
 		
 			bool first = true;
-			foreach (DataType prerequisite in prerequisites) {
+			prerequisites.foreach ((prerequisite) => {
 				if (!first) {
 					write_string (", ");
 				} else {
 					first = false;
 				}
 				write_type (prerequisite);
-			}
+				return true;
+			});
 		}
 		write_begin_block ();
 
@@ -419,7 +424,7 @@ public class Vala.CodeWriter : CodeVisitor {
 		write_begin_block ();
 
 		bool first = true;
-		foreach (EnumValue ev in en.get_values ()) {
+		en.get_values ().foreach ((ev) => {
 			if (first) {
 				first = false;
 			} else {
@@ -440,7 +445,8 @@ public class Vala.CodeWriter : CodeVisitor {
 				write_string(" = ");
 				ev.value.accept (this);
 			}
-		}
+			return true;
+		});
 
 		if (!first) {
 			if (en.get_methods ().size > 0 || en.get_constants ().size > 0) {
@@ -450,12 +456,14 @@ public class Vala.CodeWriter : CodeVisitor {
 		}
 
 		current_scope = en.scope;
-		foreach (Method m in en.get_methods ()) {
+		en.get_methods ().foreach ((m) => {
 			m.accept (this);
-		}
-		foreach (Constant c in en.get_constants ()) {
+			return true;
+		});
+		en.get_constants ().foreach ((c) => {
 			c.accept (this);
-		}
+			return true;
+		});
 		current_scope = current_scope.parent_scope;
 
 		write_end_block ();
@@ -484,7 +492,7 @@ public class Vala.CodeWriter : CodeVisitor {
 		write_begin_block ();
 
 		bool first = true;
-		foreach (ErrorCode ecode in edomain.get_codes ()) {
+		edomain.get_codes ().foreach ((ecode) => {
 			if (first) {
 				first = false;
 			} else {
@@ -500,7 +508,8 @@ public class Vala.CodeWriter : CodeVisitor {
 
 			write_indent ();
 			write_identifier (ecode.name);
-		}
+			return true;
+		});
 
 		if (!first) {
 			if (edomain.get_methods ().size > 0) {
@@ -510,9 +519,10 @@ public class Vala.CodeWriter : CodeVisitor {
 		}
 
 		current_scope = edomain.scope;
-		foreach (Method m in edomain.get_methods ()) {
+		edomain.get_methods ().foreach ((m) => {
 			m.accept (this);
-		}
+			return true;
+		});
 		current_scope = current_scope.parent_scope;
 
 		write_end_block ();
@@ -593,7 +603,7 @@ public class Vala.CodeWriter : CodeVisitor {
 			write_string (" throws ");
 
 			bool first = true;
-			foreach (DataType type in error_domains) {
+			error_domains.foreach ((type) => {
 				if (!first) {
 					write_string (", ");
 				} else {
@@ -601,7 +611,8 @@ public class Vala.CodeWriter : CodeVisitor {
 				}
 
 				write_type (type);
-			}
+				return true;
+			});
 		}
 	}
 
@@ -609,14 +620,14 @@ public class Vala.CodeWriter : CodeVisitor {
 		write_string ("(");
 
 		int i = 1;
-		foreach (Parameter param in params) {
+		params.foreach ((param) => {
 			if (i > 1) {
 				write_string (", ");
 			}
 			
 			if (param.ellipsis) {
 				write_string ("...");
-				continue;
+				return true;
 			}
 			
 			write_attributes (param);
@@ -652,7 +663,8 @@ public class Vala.CodeWriter : CodeVisitor {
 			}
 
 			i++;
-		}
+			return true;
+		});
 
 		write_string (")");
 	}
@@ -886,9 +898,10 @@ public class Vala.CodeWriter : CodeVisitor {
 	public override void visit_block (Block b) {
 		write_begin_block ();
 
-		foreach (Statement stmt in b.get_statements ()) {
+		b.get_statements ().foreach ((stmt) => {
 			stmt.accept (this);
-		}
+			return true;
+		});
 
 		write_end_block ();
 	}
@@ -921,7 +934,7 @@ public class Vala.CodeWriter : CodeVisitor {
 		write_string ("{");
 
 		bool first = true;
-		foreach (Expression initializer in list.get_initializers ()) {
+		list.get_initializers ().foreach ((initializer) => {
 			if (!first) {
 				write_string (", ");
 			} else {
@@ -929,7 +942,8 @@ public class Vala.CodeWriter : CodeVisitor {
 			}
 			first = false;
 			initializer.accept (this);
-		}
+			return true;
+		});
 		write_string (" }");
 	}
 
@@ -960,9 +974,10 @@ public class Vala.CodeWriter : CodeVisitor {
 		write_string (") {");
 		write_newline ();
 
-		foreach (SwitchSection section in stmt.get_sections ()) {
+		stmt.get_sections ().foreach ((section) => {
 			section.accept (this);
-		}
+			return true;
+		});
 
 		write_indent ();
 		write_string ("}");
@@ -970,9 +985,10 @@ public class Vala.CodeWriter : CodeVisitor {
 	}
 
 	public override void visit_switch_section (SwitchSection section) {
-		foreach (SwitchLabel label in section.get_labels ()) {
+		section.get_labels ().foreach ((label) => {
 			label.accept (this);
-		}
+			return true;
+		});
 
 		visit_block (section);
 	}
@@ -1022,26 +1038,28 @@ public class Vala.CodeWriter : CodeVisitor {
 		write_string ("for (");
 
 		bool first = true;
-		foreach (Expression initializer in stmt.get_initializer ()) {
+		stmt.get_initializer ().foreach ((initializer) => {
 			if (!first) {
 				write_string (", ");
 			}
 			first = false;
 			initializer.accept (this);
-		}
+			return true;
+		});
 		write_string ("; ");
 
 		stmt.condition.accept (this);
 		write_string ("; ");
 
 		first = true;
-		foreach (Expression iterator in stmt.get_iterator ()) {
+		stmt.get_iterator ().foreach ((iterator) => {
 			if (!first) {
 				write_string (", ");
 			}
 			first = false;
 			iterator.accept (this);
-		}
+			return true;
+		});
 
 		write_string (")");
 		stmt.body.accept (this);
@@ -1100,9 +1118,10 @@ public class Vala.CodeWriter : CodeVisitor {
 		write_indent ();
 		write_string ("try");
 		stmt.body.accept (this);
-		foreach (var clause in stmt.get_catch_clauses ()) {
+		stmt.get_catch_clauses ().foreach ((clause) => {
 			clause.accept (this);
-		}
+			return true;
+		});
 		if (stmt.finally_body != null) {
 			write_string (" finally");
 			stmt.finally_body.accept (this);
@@ -1144,14 +1163,15 @@ public class Vala.CodeWriter : CodeVisitor {
 		write_string ("[");
 
 		bool first = true;
-		foreach (Expression size in expr.get_sizes ()) {
+		expr.get_sizes ().foreach ((size) => {
 			if (!first) {
 				write_string (", ");
 			}
 			first = false;
 
 			size.accept (this);
-		}
+			return true;
+		});
 
 		write_string ("]");
 
@@ -1198,14 +1218,15 @@ public class Vala.CodeWriter : CodeVisitor {
 		write_string (" (");
 
 		bool first = true;
-		foreach (Expression arg in expr.get_argument_list ()) {
+		expr.get_argument_list ().foreach ((arg) => {
 			if (!first) {
 				write_string (", ");
 			}
 			first = false;
 
 			arg.accept (this);
-		}
+			return true;
+		});
 
 		write_string (")");
 	}
@@ -1215,14 +1236,15 @@ public class Vala.CodeWriter : CodeVisitor {
 		write_string ("[");
 
 		bool first = true;
-		foreach (Expression index in expr.get_indices ()) {
+		expr.get_indices ().foreach ((index) => {
 			if (!first) {
 				write_string (", ");
 			}
 			first = false;
 
 			index.accept (this);
-		}
+			return true;
+		});
 
 		write_string ("]");
 	}
@@ -1264,14 +1286,15 @@ public class Vala.CodeWriter : CodeVisitor {
 		write_string (" (");
 
 		bool first = true;
-		foreach (Expression arg in expr.get_argument_list ()) {
+		expr.get_argument_list ().foreach ((arg) => {
 			if (!first) {
 				write_string (", ");
 			}
 			first = false;
 
 			arg.accept (this);
-		}
+			return true;
+		});
 
 		write_string (")");
 	}
@@ -1445,7 +1468,7 @@ public class Vala.CodeWriter : CodeVisitor {
 		write_string ("(");
 		var params = expr.get_parameters ();
 		int i = 1;
-		foreach (var param in params) {
+		params.foreach ((param) => {
 			if (i > 1) {
 				write_string (", ");
 			}
@@ -1459,7 +1482,8 @@ public class Vala.CodeWriter : CodeVisitor {
 			write_identifier (param.name);
 
 			i++;
-		}
+			return true;
+		});
 		write_string (") =>");
 		if (expr.statement_body != null) {
 			expr.statement_body.accept (this);
@@ -1713,14 +1737,15 @@ public class Vala.CodeWriter : CodeVisitor {
 		if (type_params.size > 0) {
 			write_string ("<");
 			bool first = true;
-			foreach (TypeParameter type_param in type_params) {
+			type_params.foreach ((type_param) => {
 				if (first) {
 					first = false;
 				} else {
 					write_string (",");
 				}
 				write_identifier (type_param.name);
-			}
+				return true;
+			});
 			write_string (">");
 		}
 	}

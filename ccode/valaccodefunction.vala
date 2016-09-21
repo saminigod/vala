@@ -101,9 +101,10 @@ public class Vala.CCodeFunction : CCodeNode {
 		/* no deep copy for lists available yet
 		 * func.parameters = parameters.copy ();
 		 */
-		foreach (CCodeParameter param in parameters) {
+		parameters.foreach ((param) => {
 			func.parameters.add (param);
-		}
+			return true;
+		});
 		
 		func.is_declaration = is_declaration;
 		func.block = block;
@@ -127,14 +128,15 @@ public class Vala.CCodeFunction : CCodeNode {
 		writer.write_string (" (");
 		
 		bool first = true;
-		foreach (CCodeParameter param in parameters) {
+		parameters.foreach ((param) => {
 			if (!first) {
 				writer.write_string (", ");
 			} else {
 				first = false;
 			}
 			param.write (writer);
-		}
+			return true;
+		});
 		if (first) {
 			writer.write_string ("void");
 		}

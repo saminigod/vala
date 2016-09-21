@@ -235,21 +235,19 @@ public class Vala.Method : Subroutine {
 	 * Remove all parameters from this method.
 	 */
 	public void clear_parameters () {
-		foreach (Parameter param in parameters) {
+		parameters.foreach ((param) => {
 			if (!param.ellipsis) {
 				scope.remove (param.name);
 			}
-		}
+			return true;
+		});
 		parameters.clear ();
 	}
 
 	public bool is_variadic () {
-		foreach (Parameter param in parameters) {
-			if (param.ellipsis) {
-				return true;
-			}
-		}
-		return false;
+		return !parameters.foreach ((param) => {
+			return !param.ellipsis;
+		});
 	}
 
 	public override void accept (CodeVisitor visitor) {
@@ -257,9 +255,10 @@ public class Vala.Method : Subroutine {
 	}
 
 	public override void accept_children (CodeVisitor visitor) {
-		foreach (TypeParameter p in get_type_parameters ()) {
+		get_type_parameters ().foreach ((p) => {
 			p.accept (visitor);
-		}
+			return true;
+		});
 
 		if (base_interface_type != null) {
 			base_interface_type.accept (visitor);
@@ -269,28 +268,32 @@ public class Vala.Method : Subroutine {
 			return_type.accept (visitor);
 		}
 
-		foreach (Parameter param in parameters) {
+		parameters.foreach ((param) => {
 			param.accept (visitor);
-		}
+			return true;
+		});
 
-		foreach (DataType error_type in get_error_types ()) {
+		get_error_types ().foreach ((error_type) => {
 			error_type.accept (visitor);
-		}
+			return true;
+		});
 
 		if (result_var != null) {
 			result_var.accept (visitor);
 		}
 
 		if (preconditions != null) {
-			foreach (Expression precondition in preconditions) {
+			preconditions.foreach ((precondition) => {
 				precondition.accept (visitor);
-			}
+				return true;
+			});
 		}
 
 		if (postconditions != null) {
-			foreach (Expression postcondition in postconditions) {
+			postconditions.foreach ((postcondition) => {
 				postcondition.accept (visitor);
-			}
+				return true;
+			});
 		}
 
 		if (body != null) {
@@ -315,11 +318,12 @@ public class Vala.Method : Subroutine {
 		ObjectType object_type = null;
 		if (parent_symbol is ObjectTypeSymbol) {
 			object_type = new ObjectType ((ObjectTypeSymbol) parent_symbol);
-			foreach (TypeParameter type_parameter in object_type.type_symbol.get_type_parameters ()) {
+			object_type.type_symbol.get_type_parameters ().foreach ((type_parameter) => {
 				var type_arg = new GenericType (type_parameter);
 				type_arg.value_owned = true;
 				object_type.add_type_argument (type_arg);
-			}
+				return true;
+			});
 		}
 
 		if (this.get_type_parameters ().size < base_method.get_type_parameters ().size) {
@@ -383,13 +387,12 @@ public class Vala.Method : Subroutine {
 
 		/* this method may throw less but not more errors than the base method */
 		foreach (DataType method_error_type in get_error_types ()) {
-			bool match = false;
-			foreach (DataType base_method_error_type in base_method.get_error_types ()) {
+			bool match = !base_method.get_error_types ().foreach ((base_method_error_type) => {
 				if (method_error_type.compatible (base_method_error_type)) {
-					match = true;
-					break;
+					return false;
 				}
-			}
+				return true;
+			});
 
 			if (!match) {
 				invalid_match = "incompatible error type `%s'".printf (method_error_type.to_string ());
@@ -746,15 +749,17 @@ public class Vala.Method : Subroutine {
 		}
 
 		if (preconditions != null) {
-			foreach (Expression precondition in preconditions) {
+			preconditions.foreach ((precondition) => {
 				precondition.check (context);
-			}
+				return true;
+			});
 		}
 
 		if (postconditions != null) {
-			foreach (Expression postcondition in postconditions) {
+			postconditions.foreach ((postcondition) => {
 				postcondition.check (context);
-			}
+				return true;
+			});
 		}
 
 		if (body != null) {
@@ -833,18 +838,20 @@ public class Vala.Method : Subroutine {
 
 		// check that all errors that can be thrown in the method body are declared
 		if (body != null) { 
-			foreach (DataType body_error_type in body.get_error_types ()) {
+			body.get_error_types ().foreach ((body_error_type) => {
 				bool can_propagate_error = false;
-				foreach (DataType method_error_type in get_error_types ()) {
+				get_error_types ().foreach ((method_error_type) => {
 					if (body_error_type.compatible (method_error_type)) {
 						can_propagate_error = true;
 					}
-				}
+					return true;
+				});
 				bool is_dynamic_error = body_error_type is ErrorType && ((ErrorType) body_error_type).dynamic_error;
 				if (!can_propagate_error && !is_dynamic_error) {
 					Report.warning (body_error_type.source_reference, "unhandled error `%s'".printf (body_error_type.to_string()));
 				}
-			}
+				return true;
+			});
 		}
 
 		if (is_possible_entry_point (context)) {
@@ -941,13 +948,14 @@ public class Vala.Method : Subroutine {
 
 	public int get_required_arguments () {
 		int n = 0;
-		foreach (var param in parameters) {
+		parameters.foreach ((param) => {
 			if (param.initializer != null || param.ellipsis) {
 				// optional argument
-				break;
+				return false;
 			}
 			n++;
-		}
+			return true;
+		});
 		return n;
 	}
 
@@ -974,13 +982,14 @@ public class Vala.Method : Subroutine {
 
 		var params = new ArrayList<Parameter> ();
 		Parameter ellipsis = null;
-		foreach (var param in parameters) {
+		parameters.foreach ((param) => {
 			if (param.ellipsis) {
 				ellipsis = param;
 			} else if (param.direction == ParameterDirection.IN) {
 				params.add (param);
 			}
-		}
+			return true;
+		});
 
 		var callback_type = new DelegateType ((Delegate) glib_ns.scope.lookup ("AsyncReadyCallback"));
 		callback_type.nullable = true;
@@ -1014,11 +1023,12 @@ public class Vala.Method : Subroutine {
 		result_param.set_attribute_double ("CCode", "pos", 0.1);
 		params.add (result_param);
 
-		foreach (var param in parameters) {
+		parameters.foreach ((param) => {
 			if (param.direction == ParameterDirection.OUT) {
 				params.add (param);
 			}
-		}
+			return true;
+		});
 
 		return params;
 	}
@@ -1034,9 +1044,10 @@ public class Vala.Method : Subroutine {
 
 	public void get_captured_variables (Collection<LocalVariable> variables) {
 		if (captured_variables != null) {
-			foreach (var local in captured_variables) {
+			captured_variables.foreach ((local) => {
 				variables.add (local);
-			}
+				return true;
+			});
 		}
 	}
 

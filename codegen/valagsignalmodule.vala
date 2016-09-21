@@ -41,9 +41,10 @@ public class Vala.GSignalModule : GObjectModule {
 		if (params == null || params.size == 0) {
 			ret = ret + "_VOID";
 		} else {
-			foreach (Parameter p in params) {
+			params.foreach ((p) => {
 				ret = "%s_%s".printf (ret, get_ccode_marshaller_type_name (p).replace (",", "_"));
-			}
+				return true;
+			});
 		}
 		
 		return ret;
@@ -92,14 +93,15 @@ public class Vala.GSignalModule : GObjectModule {
 			signature = signature + "VOID";
 		} else {
 			bool first = true;
-			foreach (Parameter p in params) {
+			params.foreach ((p) => {
 				if (first) {
 					signature = signature + get_ccode_marshaller_type_name (p);
 					first = false;
 				} else {
 					signature = "%s,%s".printf (signature, get_ccode_marshaller_type_name (p));
 				}
-			}
+				return true;
+			});
 		}
 		
 		return signature;
@@ -155,9 +157,10 @@ public class Vala.GSignalModule : GObjectModule {
 		sig.accept_children (this);
 
 		// declare parameter type
-		foreach (Parameter p in sig.get_parameters ()) {
+		sig.get_parameters ().foreach ((p) => {
 			generate_parameter (p, cfile, new HashMap<int,CCodeParameter> (), null);
-		}
+			return true;
+		});
 
 		generate_marshaller (sig.get_parameters (), sig.return_type);
 	}
@@ -187,14 +190,15 @@ public class Vala.GSignalModule : GObjectModule {
 		var callback_decl = new CCodeFunctionDeclarator (get_marshaller_function (params, return_type, "GMarshalFunc"));
 		callback_decl.add_parameter (new CCodeParameter ("data1", "gpointer"));
 		n_params = 1;
-		foreach (Parameter p in params) {
+		params.foreach ((p) => {
 			callback_decl.add_parameter (new CCodeParameter ("arg_%d".printf (n_params), get_value_type_name_from_parameter (p)));
 			n_params++;
 			if (p.variable_type.is_array ()) {
 				callback_decl.add_parameter (new CCodeParameter ("arg_%d".printf (n_params), "gint"));
 				n_params++;
 			}
-		}
+			return true;
+		});
 		callback_decl.add_parameter (new CCodeParameter ("data2", "gpointer"));
 		ccode.add_statement (new CCodeTypeDefinition (get_value_type_name_from_type_reference (return_type), callback_decl));
 
@@ -237,7 +241,7 @@ public class Vala.GSignalModule : GObjectModule {
 		fc = new CCodeFunctionCall (new CCodeIdentifier ("callback"));
 		fc.add_argument (new CCodeIdentifier ("data1"));
 		i = 1;
-		foreach (Parameter p in params) {
+		params.foreach ((p) => {
 			string get_value_function;
 			bool is_array = p.variable_type.is_array ();
 			if (p.direction != ParameterDirection.IN) {
@@ -265,7 +269,8 @@ public class Vala.GSignalModule : GObjectModule {
 				fc.add_argument (inner_fc);
 				i++;
 			}
-		}
+			return true;
+		});
 		fc.add_argument (new CCodeIdentifier ("data2"));
 		
 		if (return_type.data_type != null || return_type.is_array ()) {
@@ -372,15 +377,16 @@ public class Vala.GSignalModule : GObjectModule {
 		}
 
 		int params_len = 0;
-		foreach (Parameter param in params) {
+		params.foreach ((param) => {
 			params_len++;
 			if (param.variable_type.is_array ()) {
 				params_len++;
 			}
-		}
+			return true;
+		});
 
 		csignew.add_argument (new CCodeConstant ("%d".printf (params_len)));
-		foreach (Parameter param in params) {
+		params.foreach ((param) => {
 			if (param.variable_type.is_array ()) {
 				if (((ArrayType) param.variable_type).element_type.data_type == string_type.data_type) {
 					csignew.add_argument (new CCodeConstant ("G_TYPE_STRV"));
@@ -395,7 +401,8 @@ public class Vala.GSignalModule : GObjectModule {
 			} else {
 				csignew.add_argument (new CCodeConstant (get_ccode_type_id (param.variable_type.data_type)));
 			}
-		}
+			return true;
+		});
 
 		marshal_arg.name = marshaller;
 

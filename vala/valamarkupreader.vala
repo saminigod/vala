@@ -72,9 +72,7 @@ public class Vala.MarkupReader : Object {
 	 */
 	public Map<string,string> get_attributes () {
 		var result = new HashMap<string,string> ();
-		foreach (var key in attributes.keys) {
-			result.set (key, attributes.get (key));
-		}
+		result.set_all (attributes);
 		return result;
 	}
 
