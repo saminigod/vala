@@ -3020,9 +3020,9 @@ namespace Gst {
 		CUSTOM_DOWNSTREAM_STICKY,
 		CUSTOM_BOTH,
 		CUSTOM_BOTH_OOB;
-		public static Gst.EventTypeFlags get_flags (Gst.EventType type);
-		public static unowned string get_name (Gst.EventType type);
-		public static GLib.Quark to_quark (Gst.EventType type);
+		public Gst.EventTypeFlags get_flags ();
+		public unowned string get_name ();
+		public GLib.Quark to_quark ();
 	}
 	[CCode (cheader_filename = "gst/gst.h", cprefix = "GST_EVENT_TYPE_", type_id = "gst_event_type_flags_get_type ()")]
 	[Flags]
@@ -3062,11 +3062,11 @@ namespace Gst {
 		[CCode (cname = "gst_formats_contains")]
 		public static bool contains ([CCode (array_length = false, array_null_terminated = true)] Gst.Format[] formats, Gst.Format format);
 		public static Gst.Format get_by_nick (string nick);
-		public static unowned Gst.FormatDefinition? get_details (Gst.Format format);
-		public static unowned string? get_name (Gst.Format format);
+		public unowned Gst.FormatDefinition? get_details ();
+		public unowned string? get_name ();
 		public static Gst.Iterator iterate_definitions ();
 		public static Gst.Format register (string nick, string description);
-		public static GLib.Quark to_quark (Gst.Format format);
+		public GLib.Quark to_quark ();
 	}
 	[CCode (cheader_filename = "gst/gst.h", cprefix = "GST_ITERATOR_ITEM_", type_id = "gst_iterator_item_get_type ()")]
 	public enum IteratorItem {
@@ -3150,8 +3150,8 @@ namespace Gst {
 		STREAMS_SELECTED,
 		REDIRECT,
 		ANY;
-		public static unowned string get_name (Gst.MessageType type);
-		public static GLib.Quark to_quark (Gst.MessageType type);
+		public unowned string get_name ();
+		public GLib.Quark to_quark ();
 	}
 	[CCode (cheader_filename = "gst/gst.h", cprefix = "GST_META_FLAG_", type_id = "gst_meta_flags_get_type ()")]
 	[Flags]
@@ -3224,7 +3224,7 @@ namespace Gst {
 		NONE,
 		PUSH,
 		PULL;
-		public static unowned string get_name (Gst.PadMode mode);
+		public unowned string get_name ();
 	}
 	[CCode (cheader_filename = "gst/gst.h", cprefix = "GST_PAD_", type_id = "gst_pad_presence_get_type ()")]
 	public enum PadPresence {
@@ -3335,9 +3335,9 @@ namespace Gst {
 		CAPS,
 		DRAIN,
 		CONTEXT;
-		public static Gst.QueryTypeFlags get_flags (Gst.QueryType type);
-		public static unowned string get_name (Gst.QueryType type);
-		public static GLib.Quark to_quark (Gst.QueryType type);
+		public Gst.QueryTypeFlags get_flags ();
+		public unowned string get_name ();
+		public GLib.Quark to_quark ();
 	}
 	[CCode (cheader_filename = "gst/gst.h", cprefix = "GST_QUERY_TYPE_", type_id = "gst_query_type_flags_get_type ()")]
 	[Flags]
@@ -3451,7 +3451,7 @@ namespace Gst {
 		CONTAINER,
 		TEXT;
 		[Version (since = "1.10")]
-		public static unowned string get_name (Gst.StreamType stype);
+		public unowned string get_name ();
 	}
 	[CCode (cheader_filename = "gst/gst.h", cprefix = "GST_STRUCTURE_CHANGE_TYPE_PAD_", type_id = "gst_structure_change_type_get_type ()")]
 	public enum StructureChangeType {
@@ -3497,7 +3497,7 @@ namespace Gst {
 		TITLE,
 		TRACK,
 		CHAPTER;
-		public static unowned string get_nick (Gst.TocEntryType type);
+		public unowned string get_nick ();
 	}
 	[CCode (cheader_filename = "gst/gst.h", cprefix = "GST_TOC_LOOP_", type_id = "gst_toc_loop_type_get_type ()")]
 	[Version (since = "1.4")]
