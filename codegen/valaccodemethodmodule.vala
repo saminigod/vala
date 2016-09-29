@@ -132,6 +132,28 @@ public abstract class Vala.CCodeMethodModule : CCodeStructModule {
 			finish_call.add_argument (new CCodeIdentifier ("_data_"));
 			finish_call.add_argument (new CCodeConstant ("NULL"));
 			ccode.add_expression (finish_call);
+
+			// Preserve the "complete now" behavior if state != 0, do so by
+			//  iterating the GTask's main context till the task is complete.
+			var state = new CCodeMemberAccess.pointer (new CCodeIdentifier ("_data_"), "_state_");
+			var zero = new CCodeConstant ("0");
+			var state_is_not_zero = new CCodeBinaryExpression (CCodeBinaryOperator.INEQUALITY, state, zero);
+			ccode.open_if (state_is_not_zero);
+
+			var task_complete = new CCodeFunctionCall (new CCodeIdentifier ("g_task_get_completed"));
+			task_complete.add_argument (async_result_expr);
+			var task_is_complete = new CCodeBinaryExpression (CCodeBinaryOperator.INEQUALITY, task_complete, new CCodeConstant ("TRUE"));
+
+			ccode.open_while (task_is_complete);
+			var task_context = new CCodeFunctionCall (new CCodeIdentifier ("g_task_get_context"));
+			task_context.add_argument (async_result_expr);
+			var iterate_context = new CCodeFunctionCall (new CCodeIdentifier ("g_main_context_iteration"));
+			iterate_context.add_argument (task_context);
+			iterate_context.add_argument (new CCodeConstant ("TRUE"));
+			ccode.add_expression (iterate_context);
+			ccode.close();
+
+			ccode.close ();
 		} else {
 			var state = new CCodeMemberAccess.pointer (new CCodeIdentifier ("_data_"), "_state_");
 			var zero = new CCodeConstant ("0");
