@@ -113,10 +113,26 @@ public class Vala.DelegateType : DataType {
 	}
 
 	public override bool check (CodeContext context) {
+		if (checked) {
+			return !error;
+		}
+
+		error = false;
+
 		if (is_called_once && !value_owned) {
 			Report.warning (source_reference, "delegates with scope=\"async\" must be owned");
 		}
-		return delegate_symbol.check (context);
+
+		var n_type_params = delegate_symbol.get_type_parameters ().size;
+		var n_type_args = get_type_arguments ().size;
+		if (n_type_args != n_type_params) {
+			Report.error (source_reference, "%d type parameter(s) required, %d given".printf (n_type_params, n_type_args));
+			error = true;
+		}
+
+		error = error || !delegate_symbol.check (context);
+		checked = true;
+		return !error;
 	}
 
 	public override bool is_disposable () {
